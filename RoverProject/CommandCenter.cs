@@ -13,7 +13,8 @@ public class CommandCenter : ICommand<Rover>
     {
         foreach (char c in commandList)
         {
-            //se il comando non è eseguibile ritorna non proseguo l'esecuzione dei comandi in coda
+            if (!_allowedCommands.Contains(c)) // if the command is not valid just skip it
+                continue;
             if (!GiveCommand(c, rover))
                 return false;
         }
@@ -35,8 +36,6 @@ public class CommandCenter : ICommand<Rover>
     /// </returns>
     public bool GiveCommand(char command, Rover rover)
     {
-        if (!_allowedCommands.Contains(command))
-            return false;
         bool result = true;
         if (command == 'l')
             rover.TurnLeft();

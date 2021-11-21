@@ -53,9 +53,11 @@
 
         FixBoundariesCoordinates();
 
+        //In reality this should be a check from a sensor from which the rover will sense the presence
+        // of an obstacle that then should be addedd to the surface map.
         if (Surface.ThereIsAnObstacle(_x, _y))
         {
-            Surface.AddObstacle(_x, _y);
+            LastDetectedObstacle = (_x, _y);
             _x = _prevx;
             _y = _prevy;
             return false;
@@ -65,6 +67,8 @@
 
     public bool MoveBackward() => MakeMove(false);
     public bool MoveForward() => MakeMove(true);
+
+    public (int x, int y) LastDetectedObstacle { get; private set; }
 
     public void TurnLeft()
     {

@@ -202,7 +202,8 @@ namespace RoverTestBench
             IApiInterface api = new RoverApiInterface();
             api.Init(surface!);
             api.SetInitialRoverPosition(1, 1, Direction.N);
-            api.SendCommands("fflff");
+            api.SendCommands("fflff", out bool obstacle);
+            Assert.IsFalse(obstacle);
             Assert.AreEqual((surface!.Length, 3, Direction.W), api.CurrentRoverPosition);
         }
 
@@ -212,7 +213,8 @@ namespace RoverTestBench
             IApiInterface api = new RoverApiInterface();
             api.Init(surface!);
             api.SetInitialRoverPosition(0, 0, Direction.N);
-            api.SendCommands("ffrfflffrff");
+            api.SendCommands("ffrfflffrff", out bool obstacle);
+            Assert.IsFalse(obstacle);
             Assert.AreEqual((4, 4, Direction.E), api.CurrentRoverPosition);
         }
 
@@ -222,7 +224,22 @@ namespace RoverTestBench
             IApiInterface api = new RoverApiInterface();
             api.Init(surface!);
             api.SetInitialRoverPosition(48, 50, Direction.E);
-            Assert.IsFalse(api.SendCommands("fflff"));
+            Assert.IsFalse(api.SendCommands("fflff", out bool obstacle));
+            Assert.IsTrue(obstacle);
+            Assert.AreEqual((49, 50, Direction.E), api.CurrentRoverPosition);
+            Assert.AreEqual((50, 50), api.LastDetectedObstacle);
+        }
+
+        [TestMethod]
+        public void WrongStringCommands()
+        {
+            IApiInterface api = new RoverApiInterface();
+            api.Init(surface!);
+            api.SetInitialRoverPosition(48, 50, Direction.E);
+            Assert.IsTrue(api.SendCommands("asdf", out bool obstacle));
+            Assert.IsFalse(obstacle);
+            Assert.IsTrue(api.SendCommands("asdkj", out obstacle));
+            Assert.IsFalse(obstacle);
             Assert.AreEqual((49, 50, Direction.E), api.CurrentRoverPosition);
         }
     }

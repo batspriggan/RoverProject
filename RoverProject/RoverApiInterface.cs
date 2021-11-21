@@ -12,6 +12,18 @@
 //                • Implement obstacle detection before each move to a new square.If a given sequence of commands encounters
 //                  an obstacle, the rover moves up to the last possible point, aborts the sequence and reports the obstacle.
 
+
+/// <summary>
+/// To Call the API:
+/// First set the known surface map with Init
+/// then setup the starting rover position and facing direction using SetInitialRoverPosition
+/// then send commands with SendCommands
+/// if the result is true then the rover have succesfully executed all the commands
+/// if false the rover have encountered problems and is last position can be retrieved using CurrentRoverPosition,
+/// moreover if obstacleDetected is true then an obstacle have been found while executing the command
+/// and the its position can be retrieved using LastDetectedObstacle
+/// </summary>
+
 public class RoverApiInterface : IApiInterface
 {
     CommandCenter _commandCenter = new CommandCenter();
@@ -19,12 +31,21 @@ public class RoverApiInterface : IApiInterface
     Rover? _rover;
     public (int, int, Direction) CurrentRoverPosition { get => _rover!.CurrentPosition; }
 
-    public bool SendCommands(string  commands)
+    public bool SendCommands(string commands, out bool obstacleDetected)
     {
+        obstacleDetected = false;
+        bool result = false;
         if (_commandCenter != null)
-            return _commandCenter.SendCommands(commands, _rover!);
-        return false;
+            result = _commandCenter.SendCommands(commands, _rover!);
+        if (result == false)
+        {
+            obstacleDetected = true;
+            LastDetectedObstacle = _rover!.LastDetectedObstacle;
+        }
+        return result;
     }
+
+    public (int x, int y) LastDetectedObstacle { get; private set; }
 
     public void SetInitialRoverPosition(int x, int y, Direction dir)
     {
